@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>g2h0</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #000; overflow: hidden; font-family: 'Space Mono', 'Courier New', monospace; }
+        canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 0;
+            display: block;
+        }
+        #overlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            text-align: center;
+            pointer-events: none;
+            padding: 2em 2.5em;
+            background: rgba(0, 0, 0, 0.30);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            border-radius: 4px;
+        }
+        #logo {
+            color: #e8fff8;
+            font-family: 'Space Mono', 'Courier New', monospace;
+            font-size: 16px;
+            line-height: 1.2;
+            letter-spacing: 0;
+            white-space: pre;
+            user-select: none;
+            margin-bottom: 1.2em;
+            text-shadow:
+                0 0 8px rgba(0, 255, 200, 0.6),
+                0 0 20px rgba(0, 200, 255, 0.3);
+        }
+        #gh-link {
+            display: inline-block;
+            pointer-events: all;
+            color: #00ffcc;
+            font-family: 'Space Mono', 'Courier New', monospace;
+            font-size: 13px;
+            letter-spacing: 0.15em;
+            text-decoration: none;
+            text-transform: lowercase;
+            opacity: 0.85;
+            transition: opacity 0.2s, text-shadow 0.2s;
+        }
+        #gh-link:hover {
+            opacity: 1.0;
+            text-shadow:
+                0 0 10px rgba(0, 255, 200, 0.9),
+                0 0 25px rgba(0, 200, 255, 0.5);
+        }
+        @media (max-width: 600px) {
+            #logo { font-size: 8px; }
+            #gh-link { font-size: 10px; }
+            #overlay { padding: 1em 1.2em; }
+        }
+        @media (max-width: 380px) {
+            #logo { font-size: 6px; }
+        }
+    </style>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+</head>
+<body>
+    <div id="overlay">
+        <pre id="logo"> ████   ████    █   █    ███ 
+█          █    █   █   █   █
+█ ███    ███    █████   █   █
+█   █   █       █   █   █   █
+ ████   █████   █   █    ███ </pre>
+        <a id="gh-link" href="https://github.com/g2h0" target="_blank" rel="noopener">github.com/g2h0</a>
+    </div>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+        // --- SCENE SETUP ---
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x000000, 0.01);
+
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000);
+        camera.position.set(0, 30, 30);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 2.0;
+
+        const composer = new EffectComposer(renderer);
+        composer.addPass(new RenderPass(scene, camera));
+        const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
+        bloomPass.strength = 1.8; bloomPass.radius = 0.4; bloomPass.threshold = 0;
+        composer.addPass(bloomPass);
+
+        // --- SCRATCH OBJECTS ---
+        const dummy = new THREE.Object3D();
+        const color = new THREE.Color();
+        const target = new THREE.Vector3();
+        const clock = new THREE.Clock();
+
+        // --- ENTANGLEMENT MESH ---
+        const E_COUNT = 20000;
+        const E_PARAMS = { separation: 80, radius: 41.6, spin: 0.42, breath: 0.695, chaos: 1.4 };
+        const addControlE = (id) => E_PARAMS[id];
+
+        const e_geo = new THREE.TetrahedronGeometry(0.25);
+        const e_mat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        const e_mesh = new THREE.InstancedMesh(e_geo, e_mat, E_COUNT);
+        e_mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+        scene.add(e_mesh);
+
+        const e_positions = [];
+        for (let i = 0; i < E_COUNT; i++) {
+            e_positions.push(new THREE.Vector3(
+                (Math.random() - 0.5) * 100,
+                (Math.random() - 0.5) * 100,
+                (Math.random() - 0.5) * 100
+            ));
+            e_mesh.setColorAt(i, color.setHex(0x00ff88));
+        }
+
+        // --- ANIMATION LOOP ---
+        function animate() {
+            requestAnimationFrame(animate);
+            const delta = clock.getDelta();
+            const time = clock.getElapsedTime();
+
+            controls.update();
+
+            // ENTANGLEMENT LOOP
+            const e_count = E_COUNT;
+            for (let i = 0; i < e_count; i++) {
+                const separation = addControlE('separation');
+                const radius     = addControlE('radius');
+                const spin       = addControlE('spin');
+                const breath     = addControlE('breath');
+                const chaos      = addControlE('chaos');
+                const count      = e_count;
+                const norm       = i / count;
+                const localNorm  = (norm * 2) % 1;
+                const side       = Math.sign(norm - 0.5);
+                const centerX    = separation * 0.5 * side;
+                const theta      = Math.acos(1 - 2 * localNorm);
+                const phi        = i * 2.39996323;
+                const sinTheta   = Math.sin(theta);
+                const cosTheta   = Math.cos(theta);
+                const ux         = sinTheta * Math.cos(phi);
+                const uy         = sinTheta * Math.sin(phi);
+                const uz         = cosTheta;
+                const rotAngle   = time * spin;
+                const c          = Math.cos(rotAngle);
+                const s          = Math.sin(rotAngle);
+                let rx           = ux * c - uz * s;
+                let rz           = ux * s + uz * c;
+                let ry           = uy;
+                const pulse      = 1 + 0.15 * Math.sin(time * breath * 2.1);
+                const effR       = radius * pulse;
+                let bx           = effR * rx;
+                let by           = effR * ry;
+                let bz           = effR * rz;
+                const jitter     = chaos * 0.35;
+                const jp         = time * 5.7 + localNorm * 27;
+                bx += jitter * Math.sin(jp);
+                by += jitter * Math.cos(jp * 1.618);
+                bz += jitter * Math.sin(jp * 0.777);
+                const mx         = side * bx;
+                const my         = side * by;
+                const mz         = side * bz;
+                target.set(centerX + mx, my, mz);
+                const hue        = 0.58 + Math.sin(time * 1.4 + localNorm * 6.28) * 0.12;
+                const sat        = 0.92;
+                const lum        = 0.52 + Math.sin(time * 3.3 + localNorm * 11) * 0.27;
+                color.setHSL(hue, sat, lum);
+
+                e_positions[i].lerp(target, 0.1);
+                dummy.position.copy(e_positions[i]);
+                dummy.updateMatrix();
+                e_mesh.setMatrixAt(i, dummy.matrix);
+                e_mesh.setColorAt(i, color);
+            }
+            e_mesh.instanceMatrix.needsUpdate = true;
+            e_mesh.instanceColor.needsUpdate = true;
+
+            composer.render();
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            composer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
