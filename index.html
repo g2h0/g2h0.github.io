@@ -164,7 +164,7 @@
                 const count      = e_count;
                 const norm       = i / count;
                 const localNorm  = (norm * 2) % 1;
-                const side       = Math.sign(norm - 0.5);
+                const side       = norm < 0.5 ? -1 : 1;
                 const centerX    = separation * 0.5 * side;
                 const theta      = Math.acos(1 - 2 * localNorm);
                 const phi        = i * 2.39996323;
