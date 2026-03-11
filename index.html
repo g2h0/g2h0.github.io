@@ -43,7 +43,7 @@
                 0 0 8px rgba(0, 255, 200, 0.6),
                 0 0 20px rgba(0, 200, 255, 0.3);
         }
-        #gh-link {
+        .link {
             display: inline-block;
             pointer-events: all;
             color: #00ffcc;
@@ -55,15 +55,21 @@
             opacity: 0.85;
             transition: opacity 0.2s, text-shadow 0.2s;
         }
-        #gh-link:hover {
+        .link:hover {
             opacity: 1.0;
             text-shadow:
                 0 0 10px rgba(0, 255, 200, 0.9),
                 0 0 25px rgba(0, 200, 255, 0.5);
         }
+        .links {
+            display: flex;
+            gap: 1.5em;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
         @media (max-width: 600px) {
             #logo { font-size: 8px; }
-            #gh-link { font-size: 10px; }
+            .link { font-size: 10px; }
             #overlay { padding: 1em 1.2em; }
         }
         @media (max-width: 380px) {
@@ -86,7 +92,11 @@
 █ ███    ███    █████   █   █
 █   █   █       █   █   █   █
  ████   █████   █   █    ███ </pre>
-        <a id="gh-link" href="https://github.com/g2h0" target="_blank" rel="noopener">github.com/g2h0</a>
+        <div class="links">
+            <a class="link" href="https://github.com/g2h0" target="_blank" rel="noopener">github</a>
+            <a class="link" href="https://youtube.com/g2h0" target="_blank" rel="noopener">youtube</a>
+            <a class="link" href="https://deviantart.com/g2h0" target="_blank" rel="noopener">deviantart</a>
+        </div>
     </div>
 
     <script type="module">
