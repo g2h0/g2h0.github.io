@@ -25,10 +25,43 @@
             text-align: center;
             pointer-events: none;
             padding: 2em 2.5em;
-            background: rgba(0, 0, 0, 0.30);
-            backdrop-filter: blur(3px);
-            -webkit-backdrop-filter: blur(3px);
-            border-radius: 4px;
+            border-radius: 16px;
+            background: linear-gradient(
+                165deg,
+                rgba(255, 255, 255, 0.07) 0%,
+                rgba(0, 255, 200, 0.03) 40%,
+                rgba(0, 200, 255, 0.02) 70%,
+                rgba(255, 255, 255, 0.04) 100%
+            );
+            backdrop-filter: blur(20px) saturate(150%) brightness(1.05);
+            -webkit-backdrop-filter: blur(20px) saturate(150%) brightness(1.05);
+            border: 1px solid rgba(0, 255, 200, 0.12);
+            box-shadow:
+                inset 0 1px 1px 0 rgba(255, 255, 255, 0.15),
+                inset 0 -2px 6px 0 rgba(0, 0, 0, 0.2),
+                inset 1px 0 3px 0 rgba(255, 255, 255, 0.04),
+                0 0 20px rgba(0, 255, 200, 0.08),
+                0 0 50px rgba(0, 200, 255, 0.04),
+                0 8px 20px -4px rgba(0, 0, 0, 0.4);
+            isolation: isolate;
+            overflow: hidden;
+        }
+        #overlay::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            border-radius: 16px 16px 0 0;
+            background: linear-gradient(
+                180deg,
+                rgba(255, 255, 255, 0.12) 0%,
+                rgba(255, 255, 255, 0.04) 50%,
+                rgba(255, 255, 255, 0.0) 100%
+            );
+            pointer-events: none;
+            z-index: -1;
         }
         #logo {
             color: #e8fff8;
@@ -45,35 +78,127 @@
         }
         .link {
             display: inline-block;
+            position: relative;
             pointer-events: all;
-            color: #00ffcc;
+            color: #e8fff8;
             font-family: 'Space Mono', 'Courier New', monospace;
             font-size: 13px;
             letter-spacing: 0.15em;
             text-decoration: none;
             text-transform: lowercase;
-            opacity: 0.85;
-            transition: opacity 0.2s, text-shadow 0.2s;
+            padding: 0.55em 1.4em;
+            border-radius: 50px;
+            background: linear-gradient(
+                165deg,
+                rgba(255, 255, 255, 0.12) 0%,
+                rgba(0, 255, 200, 0.06) 40%,
+                rgba(0, 200, 255, 0.04) 70%,
+                rgba(255, 255, 255, 0.08) 100%
+            );
+            backdrop-filter: blur(50px) saturate(200%) brightness(1.15);
+            -webkit-backdrop-filter: blur(50px) saturate(200%) brightness(1.15);
+            border: 1px solid rgba(0, 255, 200, 0.2);
+            box-shadow:
+                inset 0 1px 1px 0 rgba(255, 255, 255, 0.25),
+                inset 0 -2px 4px 0 rgba(0, 0, 0, 0.3),
+                inset 1px 0 2px 0 rgba(255, 255, 255, 0.06),
+                0 0 15px rgba(0, 255, 200, 0.12),
+                0 0 30px rgba(0, 200, 255, 0.06),
+                0 4px 8px -2px rgba(0, 255, 200, 0.15);
+            transition:
+                transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+                box-shadow 0.3s ease,
+                border-color 0.3s ease,
+                background 0.3s ease;
+            user-select: none;
+            isolation: isolate;
+            overflow: hidden;
+            --mx: 0.5;
+            --my: 0.5;
+        }
+        .link span {
+            position: relative;
+            z-index: 3;
+        }
+        .link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 55%;
+            border-radius: 50px 50px 0 0;
+            background: linear-gradient(
+                180deg,
+                rgba(255, 255, 255, 0.22) 0%,
+                rgba(255, 255, 255, 0.08) 40%,
+                rgba(255, 255, 255, 0.0) 100%
+            );
+            pointer-events: none;
+            z-index: 1;
+        }
+        .link::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50px;
+            background: radial-gradient(
+                circle 60px at calc(var(--mx) * 100%) calc(var(--my) * 100%),
+                rgba(255, 255, 255, 0.3) 0%,
+                rgba(255, 255, 255, 0.05) 40%,
+                transparent 70%
+            );
+            mix-blend-mode: overlay;
+            pointer-events: none;
+            z-index: 2;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .link:hover::after {
+            opacity: 1;
         }
         .link:hover {
-            opacity: 1.0;
-            text-shadow:
-                0 0 10px rgba(0, 255, 200, 0.9),
-                0 0 25px rgba(0, 200, 255, 0.5);
+            transform: scale(1.04);
+            border-color: rgba(0, 255, 200, 0.4);
+            background: linear-gradient(
+                165deg,
+                rgba(255, 255, 255, 0.18) 0%,
+                rgba(0, 255, 200, 0.1) 40%,
+                rgba(0, 200, 255, 0.07) 70%,
+                rgba(255, 255, 255, 0.12) 100%
+            );
+            box-shadow:
+                inset 0 1px 2px 0 rgba(255, 255, 255, 0.35),
+                inset 0 -2px 4px 0 rgba(0, 0, 0, 0.3),
+                inset 1px 0 2px 0 rgba(255, 255, 255, 0.1),
+                0 0 20px rgba(0, 255, 200, 0.2),
+                0 0 40px rgba(0, 200, 255, 0.1),
+                0 6px 12px -3px rgba(0, 255, 200, 0.2);
+        }
+        .link:hover::before {
+            background: linear-gradient(
+                180deg,
+                rgba(255, 255, 255, 0.32) 0%,
+                rgba(255, 255, 255, 0.12) 40%,
+                rgba(255, 255, 255, 0.0) 100%
+            );
         }
         .links {
             display: flex;
-            gap: 1.5em;
+            gap: 1em;
             justify-content: center;
             flex-wrap: wrap;
         }
         @media (max-width: 600px) {
             #logo { font-size: 8px; }
-            .link { font-size: 10px; }
+            .link { font-size: 10px; padding: 0.5em 1.1em; }
             #overlay { padding: 1em 1.2em; }
+            .links { gap: 0.7em; }
         }
         @media (max-width: 380px) {
             #logo { font-size: 6px; }
+            .link { font-size: 9px; padding: 0.4em 0.9em; }
+            .links { gap: 0.5em; }
         }
     </style>
     <script type="importmap">
@@ -93,9 +218,9 @@
 █   █   █       █   █   █   █
  ████   █████   █   █    ███ </pre>
         <div class="links">
-            <a class="link" href="https://github.com/g2h0" target="_blank" rel="noopener">github</a>
-            <a class="link" href="https://youtube.com/g2h0" target="_blank" rel="noopener">youtube</a>
-            <a class="link" href="https://deviantart.com/g2h0" target="_blank" rel="noopener">deviantart</a>
+            <a class="link" href="https://github.com/g2h0" target="_blank" rel="noopener"><span>github</span></a>
+            <a class="link" href="https://youtube.com/g2h0" target="_blank" rel="noopener"><span>youtube</span></a>
+            <a class="link" href="https://deviantart.com/g2h0" target="_blank" rel="noopener"><span>deviantart</span></a>
         </div>
     </div>
 
@@ -226,6 +351,18 @@
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
             composer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // --- LIQUID GLASS MOUSE TRACKING ---
+        const glassLinks = document.querySelectorAll('.link');
+        document.addEventListener('mousemove', (e) => {
+            for (const link of glassLinks) {
+                const rect = link.getBoundingClientRect();
+                const mx = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+                const my = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
+                link.style.setProperty('--mx', mx);
+                link.style.setProperty('--my', my);
+            }
         });
     </script>
 </body>
