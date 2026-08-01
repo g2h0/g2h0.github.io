@@ -64,17 +64,12 @@
             z-index: -1;
         }
         #logo {
-            color: #e8fff8;
-            font-family: 'Space Mono', 'Courier New', monospace;
-            font-size: 16px;
-            line-height: 1.2;
-            letter-spacing: 0;
-            white-space: pre;
+            display: block;
+            margin: 0 auto 1.2em;
+            width: 320px;
+            max-width: 100%;
+            height: auto;
             user-select: none;
-            margin-bottom: 1.2em;
-            text-shadow:
-                0 0 8px rgba(0, 255, 200, 0.6),
-                0 0 20px rgba(0, 200, 255, 0.3);
         }
         .link {
             display: inline-block;
@@ -190,13 +185,13 @@
             flex-wrap: wrap;
         }
         @media (max-width: 600px) {
-            #logo { font-size: 8px; }
+            #logo { width: 210px; }
             .link { font-size: 10px; padding: 0.5em 1.1em; }
             #overlay { padding: 1em 1.2em; }
             .links { gap: 0.7em; }
         }
         @media (max-width: 380px) {
-            #logo { font-size: 6px; }
+            #logo { width: 165px; }
             .link { font-size: 9px; padding: 0.4em 0.9em; }
             .links { gap: 0.5em; }
         }
@@ -212,11 +207,7 @@
 </head>
 <body>
     <div id="overlay">
-        <pre id="logo"> ████   ████    █   █    ███ 
-█          █    █   █   █   █
-█ ███    ███    █████   █   █
-█   █   █       █   █   █   █
- ████   █████   █   █    ███ </pre>
+        <canvas id="logo" aria-label="g2h0"></canvas>
         <div class="links">
             <a class="link" href="https://github.com/g2h0" target="_blank" rel="noopener"><span>github</span></a>
             <a class="link" href="https://youtube.com/g2h0" target="_blank" rel="noopener"><span>youtube</span></a>
@@ -224,6 +215,64 @@
             <a class="link" href="https://g2h0.xyz/snake-jr/" target="_blank" rel="noopener"><span>snake jr</span></a>
         </div>
     </div>
+
+    <script>
+        // --- PARTICLE LOGO ---
+        (() => {
+            const ROWS = [
+                '..... .###. #.... .###.',
+                '.#### #...# #.... #...#',
+                '#...# ...#. ####. #.#.#',
+                '#...# ..#.. #...# #...#',
+                '.#### ##### #...# .###.',
+                '....# ..... ..... .....',
+                '.###. ..... ..... .....'
+            ];
+            const CELL = 16, DOT = 4.2, PAD = 12;
+            const W = ROWS[0].length * CELL + PAD * 2;
+            const H = ROWS.length * CELL + PAD * 2;
+            const canvas = document.getElementById('logo');
+            const ctx = canvas.getContext('2d');
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            canvas.width = W * dpr;
+            canvas.height = H * dpr;
+            ctx.scale(dpr, dpr);
+            const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            const dots = [];
+            ROWS.forEach((row, y) => {
+                [...row].forEach((px, x) => {
+                    if (px !== '#') return;
+                    const tx = PAD + x * CELL + CELL / 2;
+                    const ty = PAD + y * CELL + CELL / 2;
+                    dots.push({
+                        tx, ty,
+                        x: reduced ? tx : W / 2 + (Math.random() - 0.5) * W * 1.5,
+                        y: reduced ? ty : H / 2 + (Math.random() - 0.5) * H * 1.5,
+                        p: Math.random() * Math.PI * 2
+                    });
+                });
+            });
+
+            function draw(t) {
+                ctx.clearRect(0, 0, W, H);
+                for (const d of dots) {
+                    d.x += (d.tx - d.x) * 0.08;
+                    d.y += (d.ty - d.y) * 0.08;
+                    const tw = reduced ? 1 : 0.75 + 0.25 * Math.sin(t / 700 + d.p);
+                    const hue = 160 + 18 * Math.sin(t / 1600 + d.p);
+                    ctx.beginPath();
+                    ctx.arc(d.x, d.y, DOT * tw, 0, Math.PI * 2);
+                    ctx.fillStyle = `hsl(${hue}, 100%, ${52 + 16 * tw}%)`;
+                    ctx.shadowColor = 'rgba(0, 255, 200, 0.8)';
+                    ctx.shadowBlur = 10 * tw;
+                    ctx.fill();
+                }
+                if (!reduced) requestAnimationFrame(draw);
+            }
+            reduced ? draw(0) : requestAnimationFrame(draw);
+        })();
+    </script>
 
     <script type="module">
         import * as THREE from 'three';
